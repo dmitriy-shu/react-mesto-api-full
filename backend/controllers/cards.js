@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
+const ForbiddenError = require('../errors/forbidden-err.js');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -23,12 +24,12 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
-        // eslint-disable-next-line no-shadow
+          // eslint-disable-next-line no-shadow
           .then((card) => {
             res.send(card);
           });
       } else {
-        throw new BadRequestError('Нельзя удалять чужую карточку');
+        throw new ForbiddenError('Нельзя удалять чужую карточку');
       }
     })
     .catch(next);
